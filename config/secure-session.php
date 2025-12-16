@@ -1,12 +1,11 @@
 <?php
 
-require_once './controllers/AuthController.php';  // el controlador de autentificación y
-require_once './models/Usuario.php';                 // el modelo de usuarios son cargados al empezar
-																								// ambos son declaraciones de clases -> orientación a objetos pura
+require_once './controllers/AuthController.php';
+
 // Iniciar sesión
 // los parametros comentados son propias
 // de la fase de produccion
-/*session_set_cookie_params([
+session_set_cookie_params([
     'lifetime' => 1200,                       // esto limita el tiempo de las cookies (opcional)
     'path' => '/',                            // indica desde que directorio está habilitada. Así, toda la web
     //'domain' => 'tu-dominio.com',           // indica desde que dominio se puede acceder a ella únicamente
@@ -14,8 +13,6 @@ require_once './models/Usuario.php';                 // el modelo de usuarios so
     'httponly' => true,                       //*** para que no sea accesible desde JavaScript, solo desde PHP
     'samesite' => 'Strict',                   // evita ataques CSRF. Otros valores son Lax o none (ver más abajo)
 ]);
-
-session_start();
 
 // 2. Define el intervalo en segundos (por ejemplo, 1200 segundos = 20 minutos)
 $regenerate_interval = 1200;
@@ -58,29 +55,4 @@ if (empty($_SESSION['csrf_token'])) {
     // extremadamente dificil de suplantar o imitar
 	$_SESSION['csrf_token'] = $csrf_token;
 
-}*/
-
-$controller = new AuthController();  // se crea una instancia de controlador de usuario (que incluye conexión, tabla, y operatoria con usuarios)
-
-																							 // Simple enrutamiento basado en la URL. Se concentra aquí todo el redireccionamiento
-if (!isset($_REQUEST['action'])) {             // la primera vez, entramos para hacer login y no hay en la URL action definida
-    $controller->login();
-} else {
-    switch ($_REQUEST['action']) {             // más adelante, podemos venir desde el interior con una action particular en la url
-        case 'login':
-            $controller->login();              // si la action fuera login
-            break;
-        case 'authenticate':
-            $controller->authenticate();      // si hay que autenticar
-            break;
-        case 'dashboard':
-            $controller->dashboard();         // si vamos a la página interna de inicio de la aplicación
-            break;
-        case 'logout':
-            $controller->logout();            // si cerramos la sesión
-            break;
-        default:
-            $controller->login();
-            break;
-    }
 }

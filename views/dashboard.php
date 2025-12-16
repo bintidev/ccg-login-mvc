@@ -1,6 +1,6 @@
 <?php
 
-include '.index.php';
+include './config/secure-session.php';
 
 ?>
 
@@ -17,8 +17,8 @@ include '.index.php';
 <body>
     
     <h1>CCG CRUD</h1>
-    <p>Bienvenid@, <?php echo $_SESSION['apellidos'] . ' ' . $_SESSION['nombre'] ?></p>
-    <a class="btn btn-primary" href="index.php?route=login">Logout</a>
+    <p>Bienvenid@, <?php echo $_SESSION['idusuario'] ?></p>
+    <a class="btn btn-primary" href="./index.php?route=logout">Logout</a>
 
 </body>
 </html>
