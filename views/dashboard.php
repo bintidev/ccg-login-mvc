@@ -1,6 +1,6 @@
 <?php
 
-include './config/secure-session.php';
+include 'config/secure-session.php';
 
 ?>
 

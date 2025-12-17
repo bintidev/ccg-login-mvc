@@ -1,6 +1,6 @@
 <?php
 
-include './config/secure-session.php';
+include 'config/secure-session.php';
 
 if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logeado, lo derivamos al inicio interno
     header("Location: dashboard.php");    // nosotros haremos comprobación de token
@@ -35,7 +35,7 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
         <div class="left col-lg-6 col-md-12">
         </div>
 
-        <form action="../index.php?action=authenticate" class="log-in d-flex justify-content-center align-items-center col-lg-6 col-md-12"
+        <form action="index.php?action=authenticate" class="log-in d-flex justify-content-center align-items-center col-lg-6 col-md-12"
             method="post" autocomplete="off" id="accessForm">
 
             <!-- CABECERA (logo, nombre organizacion) -->
