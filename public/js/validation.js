@@ -20,7 +20,7 @@ document.getElementById('accessForm').addEventListener("submit", function valida
     // comprobacion de id de agente
     if (agentId.trim() == '' || !agentId.match(validId)) {
 
-        msj = 'Identificación de agente incorrecto';
+        msj = 'Invalid agent identifier';
         marcarError('agentId', msj);
         correcto = false;
 
@@ -30,7 +30,7 @@ document.getElementById('accessForm').addEventListener("submit", function valida
     if (passwd.trim() == '' || !passwd.match(mayus) || !passwd.match(num) ||
         !passwd.match(special_chars) || passwd.length < 8) {
 
-        msj = 'Contraseña inválida';
+        msj = 'Invalid password';
         marcarError('passwd', msj);
         correcto = false;
 

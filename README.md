@@ -1,99 +1,101 @@
-# 🚀 Login MVC PHP - Proyecto Básico 
+# CCG Login System - PHP MVC
+![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
+![CSS](https://img.shields.io/badge/css-%23663399.svg?style=for-the-badge&logo=css&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
 
-Este proyecto es una aplicación básica de login usando PHP con arquitectura MVC sencilla, PDO para la base de datos y sesiones seguras.
+**Tecnologías usadas:** PHP 7.4+, PDO (MySQL), Bootstrap 5, JavaScript (ES6), HTML5, CSS3, XAMPP (opción de despliegue), phpMyAdmin.
 
----
+Una aplicación de autenticación desarrollada bajo el patrón MVC (Modelo-Vista-Controlador). Este sistema está pensado para gestionar el acceso de agentes (metafóricamente, los "investigadores" de CCG) con múltiples capas de protección en front y back.
 
-## Índice 📚
+## 🚀 Funcionalidades
 
-- [Descripción](#descripción)
-- [Estructura de archivos](#estructura-de-archivos)
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Seguridad](#seguridad)
-- [Capturas](#capturas)
++ Arquitectura MVC: separación de responsabilidades entre Modelo, Vista y Controlador para facilitar mantenimiento y pruebas.
++ Front Controller: `index.php` centraliza el enrutamiento y la resolución de acciones.
++ Medidas de seguridad integradas:
+  - **CSRF**: tokens por formulario y verificación en servidor para mitigar falsificación de peticiones.
+  - **Gestión de sesiones**: cookies con flags (HttpOnly, Secure recomendado, SameSite), regeneración periódica de `session_id` y expiración por inactividad.
+  - **Mitigación de fuerza bruta**: límite de intentos y bloqueo temporal con registro de eventos.
+  - **Prevención de inyección/XSS**: consultas parametrizadas (PDO) y escape/saneamiento de salidas.
++ Validación en dos capas: validación en cliente (JS) para UX y validación estricta en servidor (PHP) como fuente de confianza.
 
----
-
-## Descripción
-
-Este proyecto implementa un sistema de autenticación básico utilizando PHP puro con orientación a objetos y una estructura MVC ligera.  
-Se controla el acceso mediante sesiones y tokens CSRF para proteger contra ataques comunes.  
-
-La aplicación permite:  
-- Login de usuarios con validación y límites de intentos  
-- Redirección a un dashboard solo si el usuario está autenticado  
-- Cierre de sesión con limpieza de cookies y sesión  
-
----
-
-## Estructura de archivos 📁
+## 📁 Estructura del Proyecto
 
 ```
-LOGIN_MVC/
-│
-├── config/
-│   ├── Database.php            # Configuración de conexión PDO a MySQL
-│   └── secure-session.php      # Manejo de sesiones seguras y CSRF token
-│
-├── controllers/
-│   └── AuthController.php      # Lógica de autenticación y control de vistas
-│
-├── models/
-│   └── Usuario.php             # Modelo usuario que consulta la base de datos
-│
-├── public/
+LOGIN_MVC2/
+├── config/              # Configuración de BD y seguridad de sesión
+│   ├── Database.php
+│   └── secure-session.php
+|
+├── controllers/            # Lógica de control de flujo
+│   └── AuthController.php
+|
+├── models/                 # Lógica de datos y acceso a BD
+│   └── User.php
+|
+├── public/                 # Recursos estáticos (CSS, JS, Imágenes)
 │   ├── css/
-│   │   └── style.css           # Estilos CSS personalizados
 │   ├── img/
-│   │   ├── ccg_logo.png
-│   │   └── favicon.png
 │   └── js/
-│       └── validation.js       # Validaciones front-end
-│
-├── views/
-│   ├── dashboard.php           # Vista del dashboard post-login
-│   ├── login.php               # Vista del formulario de login
-│   └── index.php               # Enrutador principal de la app
-│
-└── index.php                   # Punto de entrada que invoca el controlador y enruta
+│       └── validation.js
+|
+├── views/                  # Plantillas de interfaz de usuario
+│   ├── dashboard.php
+│   └── login.php
+└── index.php               # Front Controller (Punto de entrada)
 ```
 
----
+## ℹ️ Función de cada componente
 
-## Requisitos ⚙️
+- `config/Database.php` — Inicializa y devuelve una instancia PDO configurada para la base de datos.
+- `config/secure-session.php` — Configura la política de sesión: parámetros de cookie, tiempo de expiración y mecanismos de regeneración de `session_id`.
+- `controllers/AuthController.php` — Controlador de autenticación: valida entradas, maneja la lógica de login/logout, actualiza estado de sesión y redirige a las vistas.
+- `models/User.php` — Encapsula acceso a la tabla de usuarios: consultas parametrizadas, verificación de credenciales y retorno de resultados (registro o códigos de error).
+- `public/css/`, `public/js/`, `public/img/` — Recursos estáticos servidos por el servidor web; `validation.js` implementa validaciones en el cliente.
+- `views/login.php` y `views/dashboard.php` — Plantillas que renderizan HTML; deben escapar contenido dinámico antes de imprimir.
+- `index.php` — Front Controller: procesa la petición HTTP, instancia el controlador correspondiente y ejecuta la acción solicitada.
 
-- PHP 7.4 o superior  
-- Servidor con soporte PDO y MySQL  
-- Base de datos MySQL/MariaDB  
+## 🛠️ Instalación y Uso con XAMPP
 
----
+1. Copia la carpeta del proyecto dentro de `htdocs` de XAMPP (ej. `C:/xampp/htdocs/login_mvc2` o `/opt/lampp/htdocs/login_mvc2`).
+2. Inicia Apache y MySQL desde el panel de control de XAMPP.
+3. Abre `phpMyAdmin` en `http://localhost/phpmyadmin` e importa el script SQL incluido para crear la base de datos `login_php` y la tabla de usuarios.
+4. Ajusta `config/Database.php` con las credenciales correctas si no coinciden con las del script.
+5. Accede a la app en `http://localhost/login_mvc2/` o `http://localhost/login_mvc2/index.php?action=login`.
 
-## Instalación y configuración 🛠️
+> Consejo: Si usas entornos Linux, asegúrate de que Apache puede leer los archivos (permisos) y que el puerto 80/443 no está en uso por otro proceso.
 
-1. Crear la base de datos `login_php` y la tabla `usuarios` con los campos `idusuario` y `password`.  
-2. Configurar las credenciales en `config/Database.php`.  
-3. Subir los archivos al servidor o ejecutar localmente.  
-4. Acceder a `index.php` desde el navegador.
+## 🔐 Seguridad
 
----
+### Front-end
 
-## Uso 📋
+- Validación de entrada en cliente para mejorar UX y reducir tráfico inválido; nunca sustituye la validación del servidor.
+- Escape y saneamiento de salida donde aplica para minimizar XSS; se recomienda aplicar Content Security Policy (CSP) en producción.
+- Uso de componentes y atributos estándar (por ejemplo `data-bs-*`) para comportamiento predecible en UI.
 
-- La página inicial muestra el formulario de login.  
-- Al enviar credenciales correctas, el usuario es redirigido al dashboard.  
-- Se limita el número de intentos fallidos a 5 para mayor seguridad.  
-- El logout destruye la sesión y limpia cookies para cerrar sesión correctamente.
+### Back-end
 
----
+- Acceso a BD mediante PDO con consultas parametrizadas para prevenir SQL Injection.
+- Gestión de sesiones robusta: configuración de parámetros de cookie (HttpOnly, Secure, SameSite), regeneración de `session_id` y expiración por inactividad.
+- CSRF: tokens vinculados a sesión y verificados en todas las rutas que procesan datos (POST).
+- Protección contra fuerza bruta: contador de intentos, bloqueo temporal y logging para auditoría.
 
-## Seguridad 🔒
+**Nota técnica:** El método `User::login()` actualmente compara contraseñas directamente; es recomendable migrar a almacenamiento y verificación con hashing seguro (`password_hash()` y `password_verify()`, p. ej. bcrypt o argon2).
 
-- Gestión segura de sesiones con configuración de cookies .  
-- Regeneración periódica del ID de sesión para prevenir secuestro.  
-- Token CSRF para proteger los formularios.  
-- Limpieza y validación básica de entradas.
+## 📸 Capturas de Pantalla
 
+![Login](/pictures/login.png "Pantalla de Login")
+*Pantalla de acceso — los agentes se identifican con su Agent ID.*
 
+![Dashboard](/pictures/dashboard.png "Dashboard")
+*Dashboard — vista tras autenticación exitosa.*
 
+> Las imágenes están en `pictures/login.png` y `pictures/dashboard.png`.
+
+## 🧭 Uso básico
+
+1. Importa la BD con phpMyAdmin.
+2. Asegúrate de que `config/Database.php` tiene tus credenciales.
+3. Accede a la URL del proyecto y usa un Agent ID registrado para iniciar sesión.

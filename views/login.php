@@ -1,6 +1,6 @@
 <?php
 
-include 'config/secure-session.php';
+//include 'config/secure-session.php';
 
 if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logeado, lo derivamos al inicio interno
     header("Location: dashboard.php");    // nosotros haremos comprobación de token
@@ -16,8 +16,8 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Access Form</title>
-    <link rel="shortcut icon" href="public/img/favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="public/css/style.css">
+    <link rel="shortcut icon" href="public/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="public/css/login-style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
@@ -40,7 +40,7 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
 
             <!-- CABECERA (logo, nombre organizacion) -->
             <img src="public/img/ccg_logo.png" alt="ccg_logo" width="80" style="margin: 0; padding: 0;" />
-            <h4>We are <span>CCG</span></h4>
+            <h4>We are <span class="fs-3">CCG</span></h4>
             <p>Welcome back, agent. Please, enter your credentials below:</p>
 
 
@@ -50,16 +50,20 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
             // ERROR esta establecida, es decir, inicializada
             if (isset($_SESSION['error'])) {
 
-                echo '<div class="alert w-75"
-                        style="background-color: rgba(211, 123, 164, 1);
-                        border: solid 1px rgb(97, 16, 43);
-                        color: rgb(97, 16, 43);"
-                        role="alert">';
-                echo $_SESSION['error'];
+                echo '<div class="alert alert-dismissible fade show w-75" id="alerta-error"
+                style="background-color: rgba(255, 166, 207, 1);
+                border: solid 1px rgb(97, 16, 43);
+                color: rgb(97, 16, 43);">';
+
+                echo '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4m.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+                </svg> &nbsp;' . $_SESSION['error'];
+
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
                 echo '</div>';
-                unset($_SESSION['error']);
-                
             }
+
+            unset($_SESSION['error']);
 
             ?>
 
@@ -83,7 +87,7 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
             </div>
 
             <!-- Campo de Contraseña -->
-            <div class="floating-label mb-5">
+            <div class="floating-label mb-4">
 
                 <input placeholder="Password" type="password" name="passwd" id="passwd" autocomplete="off">
                 <label for="passwd">Password:</label>
@@ -114,11 +118,21 @@ if (isset($_SESSION['usuario_logueado'])) {  // si el usuario estuviera ya logea
             </div>
 
             <div>
-                <input type="hidden" name="csrf_token" id="csrf_token" value='<?php echo $_SESSION["csrf_token"] ?>' />
+                <input type="hidden" name="csrf_token" id="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?>" />
             </div>
 
             <div>
-                <button type="submit" class="mb-2" name="login">Log in</button>
+
+                <?php 
+
+                    if (isset($_SESSION['blocked']) && $_SESSION['blocked']) {
+                        echo '<input class="btn text-center text-white fw-500 border border-0 rounded-2" id="login-btn" type="submit" value="Login" disabled>';
+                    } else {
+                        echo '<input class="btn text-center text-white fw-500 border border-0 rounded-2" id="login-btn" type="submit" value="Login">';
+                    }
+
+                ?>
+
             </div>
 
         </form>

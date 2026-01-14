@@ -14,6 +14,8 @@ session_set_cookie_params([
     'samesite' => 'Strict',                   // evita ataques CSRF. Otros valores son Lax o none (ver más abajo)
 ]);
 
+session_start();
+
 // 2. Define el intervalo en segundos (por ejemplo, 1200 segundos = 20 minutos)
 $regenerate_interval = 1200;
 
@@ -36,10 +38,10 @@ $session_lifetime = 7200;  // 2 horas en segundos
 if (isset($_SESSION['last_regeneration']) && (time() - $_SESSION['last_regeneration'] > $session_lifetime)) {
     // Comprueba que el tiempo transcurrido no supera el del tiempo de vida de la sesión
     // Si lo supera, desactiva la sesión
-    session_unset();
+    //session_unset();
     // Y la destruye
-    session_destroy();
-    header('Location: index.php?action=login');
+    //session_destroy();
+    header('Location: index.php?action=logout');
     exit();
 }
 

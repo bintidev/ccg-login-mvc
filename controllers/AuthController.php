@@ -1,7 +1,6 @@
 <?php
-
-require_once 'config/secure-session.php';
-require_once 'models/Usuario.php';
+// controllers/AuthController.php
+//include 'config/secure-session.php';
 
 class AuthController                                   // la clase AuthController contiene un objeto usuario (el que autentica)
 {
@@ -9,7 +8,7 @@ class AuthController                                   // la clase AuthControlle
 
     public function __construct()                     // aquí lo crea
     {
-        $this->userModel = new Usuario();
+        $this->userModel = new User();
     }
 
     public function login()                           // aquí ejecuta el login (en realidad, la vista login)
@@ -24,51 +23,76 @@ class AuthController                                   // la clase AuthControlle
 
             if (isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
 
-                // variable de sesión de intentos que controla las veces
+                // variable de sesión de attempts que controla las veces
                 // que el usuario hace login
-                if (!isset($_SESSION['intentos'])) {
-                    $_SESSION['intentos'] = 0;
+                if (!isset($_SESSION['attempts'])) {
+                    $_SESSION['attempts'] = 0;
+                }
+
+                if(!isset($_SESSION['next_attempt'])) {
+                    $_SESSION['next_attempt'] = 900; // tiempo de espera de 15 mins para nuevo intento
+                }
+
+                if(!isset($_SESSION['last_attempt'])) {
+                    $_SESSION['last_attempt'] = time(); // tiempo transcurrido desde el último intento
+                }
+
+                if(!isset($_SESSION['blocked'])) {
+                    $_SESSION['blocked'] = false; // indica si el usuario está bloqueado
+                }
+
+                if(time() - $_SESSION['last_attempt'] > $_SESSION['next_attempt'] && $_SESSION['attempts'] >=5) {
+                    // si ha pasado el tiempo de espera, reseteamos los intentos
+                    $_SESSION['attempts'] = 0;
+                    $_SESSION['next_attempt'] = 900; // reseteamos el tiempo de espera a 15 mins
+                    $_SESSION['last_attempt'] = time();
+                    $_SESSION['blocked'] = false;
                 }
 
                 // 'restringe' el acceso
-                if ($_SESSION['intentos'] >= 5) {
-                    $_SESSION['error'] = "Numero de intentos fallidos sobrepasados.";
+                if ($_SESSION['attempts'] >= 5) {
+
+                    $_SESSION['blocked'] = true;
+                    $_SESSION['error'] = "You have exceeded the number of attempts allowed. Please try again later.";
                     include 'views/login.php';
 
                 } else {
 
-                    $agentId = htmlspecialchars($_POST['agentId']);
-                    $passwd = $_POST['passwd'];
+                    $username = htmlspecialchars($_POST['agentId']);
+                    $password = htmlspecialchars($_POST['passwd']);
 
-                    if ($this->userModel->login($agentId, $passwd)) {
-                        // Autenticación exitosa, iniciar sesión y redirigir al enrutador para que éste envíe al dashboard-inicio
-                        $_SESSION['idusuario'] = $agentId;
-                        $_SESSION['usuario_logueado'] = true;
-                        $_SESSION['intentos'] = 0;
-                        header('Location: index.php?action=dashboard');
-                        exit();
+                    $login = $this->userModel->login($username, $password);
+
+                    // comrpbaciones de las credenciales
+                    if ($login === 'u_notfound') {
+                        // Usuario inexistente o incorrecto, redireccion al enrutador para enviar de vuelta al login
+                        $_SESSION['error'] = "User not found.";
+                        $_SESSION['attempts']++; // aumento de numero de attempts fallidos
+                        include 'views/login.php';
+                    
+                    } else if ($login === 'p_notfound') {
+                        // Contraseña incorrecta, redireccion al enrutador para enviar de vuelta al login
+                        $_SESSION['error'] = "Incorrect password.";
+                        $_SESSION['attempts']++;
+                        include 'views/login.php';
+
                     } else {
-                        // Autenticación fallida, recargar login con error que mostraría mensaje
-                        $_SESSION['error'] = "Usuario o contraseña incorrectos.";
-                        $_SESSION['intentos']++;
-                        header('Location: index.php?action=login');
+                        // Autenticación exitosa, iniciar sesión y redirigir al enrutador para que éste envíe al dashboard-inicio
+                        $_SESSION['idusuario'] = $username;
+                        $_SESSION['attempts'] = 0;
+                        header('Location: index.php?action=dashboard');
                         exit();
                     }
                 }
 
             } else {
-                // mensaje de error si el usuario intenta acceder directamente desde el enlace
-                // habiendose saltado la autenticacion
-                $_SESSION['error'] = 'Debe proporcionar las credenciales para acceder al sistema.';
-                // se muestra en el alert del formulario de login
-                header('Location: index.php?action=login');
-                exit();
+                $_SESSION['error'] = "Credentials required to access the system.";
+                include 'views/login.php';
             }
 
         } else {
-            $_SESSION['error'] = "Petición inválida.";
-            header('Location: index.php?action=login');
-            exit();
+            $_SESSION['error'] = "Invalid request.";
+            include 'views/login.php';
         }
     }
 
@@ -80,12 +104,14 @@ class AuthController                                   // la clase AuthControlle
             exit();
         }
         // Carga la vista del dashboard (página de bienvenida)
+        $_SESSION['usuario_logueado'] = true;
         include 'views/dashboard.php';
     }
 
     public function logout()
     {
-
+        // restablece los datos de la sesión para el resto del tiempo de ejecución
+        $_SESSION = [];
         // envía como Set-Cookie para invalidar la cookie de sesión
         /*** destruccion de cookies de forma explicita y otras potencialmente peligrosas ***/
         if (isset($_COOKIE[session_name()])) {
@@ -94,6 +120,8 @@ class AuthController                                   // la clase AuthControlle
         }
 
         session_destroy();
+
+        $_SESSION['error'] = "Logout successful.";
         header('Location: index.php?action=login');
         exit();
     }
