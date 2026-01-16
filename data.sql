@@ -20,6 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `login_php`
 --
+DROP DATABASE IF EXISTS `login_php`;
+
+
 CREATE DATABASE IF NOT EXISTS `login_php` DEFAULT CHARACTER SET utf8 COLLATE utf8_spanish_ci;
 USE `login_php`;
 
@@ -29,8 +32,8 @@ USE `login_php`;
 -- Estructura de tabla para la tabla `users`
 --
 
-CREATE TABLE `users` (
-  `user` int(11) NOT NULL,
+CREATE TABLE `admins` (
+  `user` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `agentid` varchar(5) NOT NULL,
   `password` varchar(255) NOT NULL,
   `last_name` varchar(80) NOT NULL,
@@ -41,10 +44,8 @@ CREATE TABLE `users` (
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`user`, `agentid`, `password`, `last_name`, `name`) VALUES
-('MK001', 'KureoMad0_!', 'Mado', 'Kureo');
-
-INSERT INTO `users` (`user`, `agentid`, `password`, `last_name`, `name`) VALUES
+INSERT INTO `admins` (`agentid`, `password`, `last_name`, `name`) VALUES
+('MK001', 'KureoMad0_!', 'Mado', 'Kureo'),
 ('TN219', '@tsuri-wLuV33', 'Nori', 'Tsuda');
 
 --
@@ -52,15 +53,14 @@ INSERT INTO `users` (`user`, `agentid`, `password`, `last_name`, `name`) VALUES
 --
 
 --
--- Base de datos: `ghoul_system`
+-- Estructura de tabla para la tabla `ghouls`
 --
-CREATE DATABASE IF NOT EXISTS `ghoul_system` DEFAULT CHARACTER SET utf8 COLLATE utf8_spanish_ci;
-USE `ghoul_system`;
 
+DROP USER IF EXISTS `login-php`@`localhost`;
+GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, DELETE HISTORY ON *.* TO `login-php`@`localhost` IDENTIFIED BY PASSWORD '*2A80256C5318AF3140A37693CCD04CE699D8D947';
 
-GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, DELETE HISTORY ON login_php.* TO `login-php`@`localhost` IDENTIFIED BY PASSWORD 'CCG_login.php';
 --
--- Usuario con acceso a la base de datos
+-- Usuario con acceso a ambas BD
 --
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
